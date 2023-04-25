@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import scipy.ndimage as nd
-import keras.layers as layers
+from tensorflow.keras import layers
 import tensorflow as tf
 
 ## LOCAL IMPORTS

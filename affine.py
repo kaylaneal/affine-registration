@@ -3,7 +3,7 @@ import os
 from PIL import Image
 import numpy as np
 import scipy.ndimage as nd
-import tensorflow as tf
+from tensorflow.keras import callbacks, models
 import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
@@ -13,8 +13,8 @@ from network import Affine_Network
 import utils
 
 # Data Paths:
-json_1 = 'trainingdata/perfectpairs/image-sets (1)/info.json'
-images_1 = 'trainingdata/perfectpairs/image-sets (1)'
+json_1 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (1)/info.json'
+images_1 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (1)' 
 
 # Create Dataset:
 dataset = create_dataset(json_1)
@@ -23,10 +23,11 @@ transforms = {}
 mc = 0
 
 for i in dataset.pairs.items():
+    print(f'\npair {i[0]} of {len(dataset.pairs.items())}')
     static = Image.open(os.path.join(images_1, i[1][0])).convert('L') # with convert('L') arrays are shape (256, 256)
     moving = Image.open(os.path.join(images_1, i[1][1])).convert('L')
 
-    # Normalize, Pad, Smooth, Resample:
+    print('** Normalize, Pad, Smooth, Resample: **')
     static = np.asarray(static)
     static = 1 - utils.normalize(static)   
     
@@ -50,11 +51,11 @@ for i in dataset.pairs.items():
     static = np.expand_dims(static, (0, -1))                        # Segmentation expects shape of (B, H, W, C)
     moving = np.expand_dims(moving, (0, -1))                        # New Shape: (1, 512, 512, 1)
     #print(f'Static Shape {static.shape}\nMoving Shape {moving.shape}')
-
+    print('** SEGMENTING **')
     seg_static, seg_moving = utils.segmentation(static, moving)
     masks.update(
         { mc : [static - seg_static, moving - seg_moving] } )
-    
+    print('** INITIAL TRANSFORM **')
     initial_transformation = find_theta(static, moving)
     transforms.update(
         { mc : initial_transformation }
@@ -64,6 +65,7 @@ for i in dataset.pairs.items():
     mc += 1
 
 ## DATA VIS
+print('\n** DATA VIS **')
 for i in range(4):
     plt.subplot(2, 2, (i+1))
     d = np.array(dataset.pairs.get(i)[0]).squeeze()
@@ -84,8 +86,10 @@ plt.title('Moving0 Mask')
 plt.axis('off')
 mask_fig.tight_layout()
 mask_fig.savefig('figures/dataset1_pair0_masks.png')
-## MODEL
 
+
+## MODEL
+print('\n** BUILDING MODEL **')
 # Build Model:
 model = Affine_Network()
 
@@ -107,12 +111,18 @@ X = np.array(X).reshape(-1, 512, 512, 2)
 Y = np.array(Y)
 
 # Compile Model
-callbacks = [tf.keras.callbacks.EarlyStopping('loss', patience = 8)]
-model.compile(optimizer = 'adam', loss = tf.keras.losses.KLDivergence(), metrics = ['accuracy'])
+model.compile(optimizer = 'adam', loss = 'mse', metrics = ['accuracy'])
 
 # Train Model
-hist = model.fit(X, Y, batch_size = 10, validation_split = 0.2, epochs = 100, callbacks = callbacks)
-tf.keras.models.save_model(model, 'models/affine_model')
+print('\n** TRAINING **')
+hist = model.fit(X, Y, batch_size = 10, validation_split = 0.1, epochs = 100)
+# model.summary()
+models.save_model(model, 'models/affine_model')
 
 # Results:
-print(hist.history.keys())
+f = plt.figure()
+f.add_subplot(111)
+plt.plot(hist.history['accuracy'])
+plt.plot(hist.history['val_accuracy'])
+plt.legend(['training', 'validation'])
+f.savefig('figures/acc_curve.png')

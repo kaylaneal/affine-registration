@@ -1,45 +1,46 @@
 # INPUTS
 import tensorflow as tf
+from tensorflow.keras import Model, layers, Sequential
 
 ## PARTIAL MODELS:
-class Regression_Network(tf.keras.Model):
+class Regression_Network(Model):
     def __init__(self):
         super(Regression_Network, self).__init__()
 
-        self.fc = tf.keras.Sequential([
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(3)                # 256x256 to 3 variables
+        self.fc = Sequential([
+            layers.Flatten(),
+            layers.Dense(3)                # 256x256 to 3 variables
         ])
     
     def call(self, x):
         x = self.fc(x)
         return x
 
-class Forward_Block(tf.keras.Model):
+class Forward_Block(Model):
     def __init__(self, channels, pool = False):
         super(Forward_Block, self).__init__()
         
         self.pool = pool
         if self.pool:
-            self.pool_layer = tf.keras.Sequential([
-                tf.keras.layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same')
+            self.pool_layer = Sequential([
+                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same')
             ])
-            self.layer = tf.keras.Sequential([
-                tf.keras.layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same'),
-                tf.keras.layers.GroupNormalization(2*channels),
-                tf.keras.layers.PReLU(),
-                tf.keras.layers.Conv2D(2*channels, kernel_size = 3, strides = 1, padding = 'same'),
-                tf.keras.layers.GroupNormalization(2*channels),
-                tf.keras.layers.PReLU()
+            self.layer = Sequential([
+                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same'),
+                layers.BatchNormalization(),
+                layers.PReLU(),
+                layers.Conv2D(2*channels, kernel_size = 3, strides = 1, padding = 'same'),
+                layers.BatchNormalization(),
+                layers.PReLU()
             ])
         else:
-            self.layer = tf.keras.Sequential([
-                tf.keras.layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
-                tf.keras.layers.GroupNormalization(channels),
-                tf.keras.layers.PReLU(),
-                tf.keras.layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
-                tf.keras.layers.GroupNormalization(channels),
-                tf.keras.layers.PReLU()
+            self.layer = Sequential([
+                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
+                layers.BatchNormalization(),
+                layers.PReLU(),
+                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
+                layers.BatchNormalization(),
+                layers.PReLU()
             ])
 
     def call(self, x):
@@ -48,12 +49,12 @@ class Forward_Block(tf.keras.Model):
         else:
             return x + self.layer(x)
         
-class Feature_Extractor(tf.keras.Model):
+class Feature_Extractor(Model):
     def __init__(self):
         super(Feature_Extractor, self).__init__()
 
-        self.input_layer = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(64, kernel_size = 7, strides = 2, padding = 'same')
+        self.input_layer = Sequential([
+            layers.Conv2D(64, kernel_size = 7, strides = 2, padding = 'same')
         ])
 
         self.layer1 = Forward_Block(64, pool = True)
@@ -63,14 +64,14 @@ class Feature_Extractor(tf.keras.Model):
         self.layer5 = Forward_Block(256, pool = True)
         self.layer6 = Forward_Block(512, pool = True)
 
-        self.last_layer = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(512, kernel_size = 3, strides = 2, padding = 'same'),
-            tf.keras.layers.GroupNormalization(512),
-            tf.keras.layers.PReLU(),
-            tf.keras.layers.Conv2D(256, kernel_size = 3, strides = 2, padding = 'same'),
-            tf.keras.layers.GroupNormalization(256),
-            tf.keras.layers.PReLU(),
-            tf.keras.layers.AvgPool2D((1, 1))
+        self.last_layer = Sequential([
+            layers.Conv2D(512, kernel_size = 3, strides = 2, padding = 'same'),
+            layers.BatchNormalization(),
+            layers.PReLU(),
+            layers.Conv2D(256, kernel_size = 3, strides = 2, padding = 'same'),
+            layers.BatchNormalization(),
+            layers.PReLU(),
+            layers.AvgPool2D((1, 1))
         ])
 
     def call(self, x):
