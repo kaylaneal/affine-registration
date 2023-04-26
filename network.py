@@ -26,19 +26,19 @@ class Forward_Block(tf.keras.Model):
             ])
             self.layer = tf.keras.Sequential([
                 tf.keras.layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same'),
-                tf.keras.layers.GroupNormalization(2*channels),
+                tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.PReLU(),
                 tf.keras.layers.Conv2D(2*channels, kernel_size = 3, strides = 1, padding = 'same'),
-                tf.keras.layers.GroupNormalization(2*channels),
+                tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.PReLU()
             ])
         else:
             self.layer = tf.keras.Sequential([
                 tf.keras.layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
-                tf.keras.layers.GroupNormalization(channels),
+                tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.PReLU(),
                 tf.keras.layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
-                tf.keras.layers.GroupNormalization(channels),
+                tf.keras.layers.BatchNormalization(),
                 tf.keras.layers.PReLU()
             ])
 
@@ -65,10 +65,10 @@ class Feature_Extractor(tf.keras.Model):
 
         self.last_layer = tf.keras.Sequential([
             tf.keras.layers.Conv2D(512, kernel_size = 3, strides = 2, padding = 'same'),
-            tf.keras.layers.GroupNormalization(512),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.PReLU(),
             tf.keras.layers.Conv2D(256, kernel_size = 3, strides = 2, padding = 'same'),
-            tf.keras.layers.GroupNormalization(256),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.PReLU(),
             tf.keras.layers.AvgPool2D((1, 1))
         ])

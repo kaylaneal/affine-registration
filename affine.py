@@ -1,6 +1,7 @@
 # IMPORTS
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
 from init_datasets import testset, validset, trainset
@@ -44,8 +45,22 @@ valid_y = np.array(valid_y)
 
 # Define Model
 model = Affine_Network()
-model.compile(optimizer = 'adam', metrics = ['accuracy'], loss = 'mse')
+model.compile(optimizer = 'adam', metrics = ['accuracy'], loss = tf.keras.losses.Huber())
 history = model.fit(train_x, train_y, validation_data = (valid_x, valid_y), 
-          epochs = 150, callbacks = tf.keras.callbacks.EarlyStopping(monitor = 'loss', patience = 8), batch_size = 10)
+          epochs = 150, callbacks = tf.keras.callbacks.EarlyStopping(monitor = 'loss', patience = 10, restore_best_weights = True), batch_size = 10)
 
-print(history)
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Accuracy Curve')
+plt.legend(['train', 'valid'])
+plt.savefig('figures/accuracy-curve.png')
+
+plt.clf()
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Huber Loss Curve')
+plt.legend(['train', 'valid'])
+plt.savefig('figures/huberloss-curve.png')
+
+model.save('model/AffineNet')
