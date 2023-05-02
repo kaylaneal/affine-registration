@@ -1,9 +1,8 @@
 # IMPORTS
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
-from evaluate import test_x, test_y
+from evaluate import test_x
 
 # Load Model
 model = tf.keras.models.load_model('AffineNet')
