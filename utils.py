@@ -1,12 +1,6 @@
 # IMPORTS
-import os
 import numpy as np
 import scipy.ndimage as nd
-from tensorflow.keras import layers
-import tensorflow as tf
-
-## LOCAL IMPORTS
-
 
 ## PREPROCESSING STEPS
 def normalize(image: np.array):

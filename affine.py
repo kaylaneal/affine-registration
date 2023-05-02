@@ -4,13 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
-from init_datasets import testset, validset, trainset
+from init_datasets import validset, trainset
 from network import Affine_Network
 
 # Load/Preprocess Datasets
 print('*** PREPROCESSING ***')
 trainset.preprocess_data()
-testset.preprocess_data()
 validset.preprocess_data()
 
 # X, Y Process
@@ -47,7 +46,15 @@ valid_y = np.array(valid_y)
 model = Affine_Network()
 model.compile(optimizer = 'adam', metrics = ['accuracy'], loss = tf.keras.losses.Huber())
 history = model.fit(train_x, train_y, validation_data = (valid_x, valid_y), 
-          epochs = 150, callbacks = tf.keras.callbacks.EarlyStopping(monitor = 'loss', patience = 10, restore_best_weights = True), batch_size = 10)
+          epochs = 150, callbacks = tf.keras.callbacks.EarlyStopping(monitor = 'val_loss', patience = 10, restore_best_weights = True), batch_size = 10)
+
+# Evaluate
+print('*** EVALUATING ***')
+valid_results = model.evaluate(valid_x, valid_y)
+print(f'Validation Loss: {valid_results[0]:.2f}, Validation Accuracy: {valid_results[1] * 100:.1f}')
+
+# History Plots
+print('*** PLOTTING ***')
 
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
@@ -63,4 +70,4 @@ plt.title('Huber Loss Curve')
 plt.legend(['train', 'valid'])
 plt.savefig('figures/huberloss-curve.png')
 
-model.save('model/AffineNet')
+model.save('AffineNet')
