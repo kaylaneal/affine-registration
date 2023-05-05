@@ -1,4 +1,5 @@
 # IMPORTS
+import os
 import pandas as pd
 
 '''
@@ -18,31 +19,24 @@ movingImage
     # As grayscale ('L') shape is (256, 256)
 
 class PerfectPairDataset:
-    def __init__(self, json_df:pd.DataFrame):
-        assert json_df is not None, 'requires JSON!'
-        self.json_df = json_df
+    def __init__(self, json):
+        self.json_df = pd.read_json(json)
+        self.path = os.path.dirname(json)
         self.pairs = {}
         self.pair_labels = {}
-        self.xya = {}
 
         self.add_pairs()
     
     def add_pairs(self):
         for idx, r in self.json_df.iterrows():
             self.pairs.update({
-                idx : [r['staticImage'], r['movingImage']]
+                idx : [os.path.join(self.path, r['staticImage']), os.path.join(self.path, r['movingImage'])]
             })
             self.pair_labels.update({
-                            idx : [r['deltaTheta'], r['deltaXviewport'], r['deltaYviewport']]
+                            idx : [r['x'], r['y'], r['a']]
                             })
-            self.xya.update({
-                idx : (r['x'], r['y'], r['a'])
-            })
-
 
 def create_dataset(json_file):
-    dataset_df = pd.read_json(json_file)
-    
-    dataset = PerfectPairDataset(dataset_df)
+    dataset = PerfectPairDataset(json_file)
 
     return dataset
