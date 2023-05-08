@@ -23,24 +23,26 @@ class Forward_Block(Model):
         self.pool = pool
         if self.pool:
             self.pool_layer = Sequential([
-                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same')
+                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same', kernel_regularizer = 'l2')
             ])
             self.layer = Sequential([
-                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same'),
+                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same', kernel_regularizer = 'l2'),
                 layers.BatchNormalization(),
                 layers.PReLU(),
-                layers.Conv2D(2*channels, kernel_size = 3, strides = 1, padding = 'same'),
+                layers.Conv2D(2*channels, kernel_size = 3, strides = 1, padding = 'same', kernel_regularizer = 'l2'),
                 layers.BatchNormalization(),
-                layers.PReLU()
+                layers.PReLU(),
+                layers.Dropout(0.2)
             ])
         else:
             self.layer = Sequential([
-                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
+                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same', kernel_regularizer = 'l2'),
                 layers.BatchNormalization(),
                 layers.PReLU(),
-                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same'),
+                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same', kernel_regularizer = 'l2'),
                 layers.BatchNormalization(),
-                layers.PReLU()
+                layers.PReLU(),
+                layers.Dropout(0.2)
             ])
 
     def call(self, x):
@@ -54,7 +56,7 @@ class Feature_Extractor(Model):
         super(Feature_Extractor, self).__init__()
 
         self.input_layer = Sequential([
-            layers.Conv2D(64, kernel_size = 7, strides = 2, padding = 'same')
+            layers.Conv2D(64, kernel_size = 7, strides = 2, padding = 'same', kernel_regularizer = 'l2')
         ])
 
         self.layer1 = Forward_Block(64, pool = True)
@@ -71,7 +73,7 @@ class Feature_Extractor(Model):
             layers.Conv2D(256, kernel_size = 3, strides = 2, padding = 'same'),
             layers.BatchNormalization(),
             layers.PReLU(),
-            layers.AvgPool2D((1, 1))
+            layers.GlobalAveragePooling2D()
         ])
 
     def call(self, x):

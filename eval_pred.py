@@ -31,11 +31,10 @@ test_y = np.array(test_y)
 
 print('** PREDICT **')
 predictions = model.predict(test_X, verbose = False)
-#model.evaluate(test_X, test_y, verbose = 2)
-
-
-print(f'Truth Label 0: {test_y[0]}')
-print(f'Predicted Label 0: {predictions[0]}')
+model.evaluate(test_X, test_y, verbose = 2)
 print()
-print(f'Truth Label 10: {test_y[10]}')
-print(f'Predicted Label 10: {predictions[10]}')
+
+for i in range(10):
+    print(f'Truth Value: {test_y[i]}')
+    print(f'Predicted Value: {predictions[i].flatten()}')
+    print()

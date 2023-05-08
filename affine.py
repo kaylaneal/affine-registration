@@ -1,7 +1,7 @@
 # IMPORTS
 from PIL import Image
 import numpy as np
-from tensorflow.keras import callbacks, models
+from tensorflow.keras import callbacks, models, optimizers, losses, metrics
 import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
@@ -57,11 +57,14 @@ valid_X = np.array(valid_X).reshape(-1, 256, 256, 2)
 valid_y = np.array(valid_y)
 
 # Compile Model
-model.compile(optimizer = 'adam', loss = 'huber', metrics = ['accuracy'])
+lr_sched = optimizers.schedules.InverseTimeDecay(0.001, decay_steps = 15, decay_rate = 1)
+model.compile(optimizer = optimizers.Adam(learning_rate = lr_sched), loss = losses.MeanSquaredLogarithmicError(), metrics = ['accuracy', metrics.RootMeanSquaredError(name = 'rmse')])
 
 # Train Model
 print('\n** TRAINING **')
-hist = model.fit(X, Y, validation_data = (valid_X, valid_y), epochs = 100, callbacks = [callbacks.EarlyStopping(monitor = 'val_loss', patience = 10, restore_best_weights = True)])
+hist = model.fit(X, Y, validation_data = (valid_X, valid_y), 
+                 batch_size = 32, epochs = 200,
+                 callbacks = [callbacks.EarlyStopping(monitor = 'val_loss', patience = 8, restore_best_weights = True)])
 # model.summary()
 models.save_model(model, 'affine_model')
 
@@ -79,5 +82,5 @@ lf.add_subplot(111)
 plt.plot(hist.history['loss'])
 plt.plot(hist.history['val_loss'])
 plt.legend(['training', 'validation'])
-plt.title('Huber Loss Curve')
+plt.title('MSLE Loss Curve')
 lf.savefig('figures/loss_curve.png')
