@@ -96,6 +96,8 @@ class Affine_Network(tf.keras.Model):
         self.regression_network = Regression_Network()
     
     def call(self, X):
-        x = self.feature_extractor(X)
+        x = self.feature_extractor(X[0])
+        x2 = self.feature_extractor(X[1])
+        x = layers.Concatenate(axis = -1)([x, x2])
         x = self.regression_network(x)
         return x
