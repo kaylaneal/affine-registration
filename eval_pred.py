@@ -1,12 +1,12 @@
 # IMPORTS
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 import numpy as np
 
 ## LOCAL IMPORTS
 from init_datasets import testset
 
 print('** LOADING TRAINED MODEL **')
-model = load_model('stratified_input_AN')
+model = tf.keras.models.load_model('multi_affine.h5')
 
 print('** LOAD TESTING DATA **')
 sx, mx = testset.process_imgpairs()

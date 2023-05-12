@@ -1,103 +1,59 @@
-# INPUTS
+# IMPORTS
 import tensorflow as tf
-from tensorflow.keras import Model, layers, Sequential
+from tensorflow.keras import layers
 
-## PARTIAL MODELS:
-class Regression_Network(Model):
-    def __init__(self):
-        super(Regression_Network, self).__init__()
+def Feature_Extractor(x, channels):
 
-        self.fc = Sequential([
-            layers.Flatten(),
-            layers.Dense(3)                # 256x256 to 3 variables
-        ])
+    x = layers.Conv2D(channels, kernel_size = 3, strides = 2,
+                      padding = 'same', kernel_regularizer = 'l2')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
+
+    x = layers.Conv2D(channels, kernel_size = 3, strides = 2,
+                      padding = 'same', kernel_regularizer = 'l2')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
+
+    return x
+
+def Final_FELayer(x):
+
+    x = layers.Conv2D(512, kernel_size = 3, strides = 2, padding = 'same')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
+
+    x = layers.Conv2D(256, kernel_size = 3, strides = 2, padding = 'same')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.PReLU()(x)
+
+    x = layers.GlobalAveragePooling2D()(x)
     
-    def call(self, x):
-        x = self.fc(x)
-        return x
+    return x
 
-class Forward_Block(Model):
-    def __init__(self, channels, pool = False):
-        super(Forward_Block, self).__init__()
-        
-        self.pool = pool
-        if self.pool:
-            self.pool_layer = Sequential([
-                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same', kernel_regularizer = 'l2')
-            ])
-            self.layer = Sequential([
-                layers.Conv2D(2*channels, kernel_size = 3, strides = 2, padding = 'same', kernel_regularizer = 'l2'),
-                layers.BatchNormalization(),
-                layers.PReLU(),
-                layers.Conv2D(2*channels, kernel_size = 3, strides = 1, padding = 'same', kernel_regularizer = 'l2'),
-                layers.BatchNormalization(),
-                layers.PReLU(),
-                layers.Dropout(0.2)
-            ])
-        else:
-            self.layer = Sequential([
-                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same', kernel_regularizer = 'l2'),
-                layers.BatchNormalization(),
-                layers.PReLU(),
-                layers.Conv2D(channels, kernel_size = 3, strides = 1, padding = 'same', kernel_regularizer = 'l2'),
-                layers.BatchNormalization(),
-                layers.PReLU(),
-                layers.Dropout(0.2)
-            ])
-
-    def call(self, x):
-        if self.pool:
-            return self.pool_layer(x) + self.layer(x)
-        else:
-            return x + self.layer(x)
-        
-class Feature_Extractor(Model):
-    def __init__(self):
-        super(Feature_Extractor, self).__init__()
-
-        self.input_layer = Sequential([
-            layers.Conv2D(64, kernel_size = 7, strides = 2, padding = 'same', kernel_regularizer = 'l2')
-        ])
-
-        self.layer1 = Forward_Block(64, pool = True)
-        self.layer2 = Forward_Block(128, pool = False)
-        self.layer3 = Forward_Block(128, pool = True)
-        self.layer4 = Forward_Block(256, pool = False)
-        self.layer5 = Forward_Block(256, pool = True)
-        self.layer6 = Forward_Block(512, pool = True)
-
-        self.last_layer = Sequential([
-            layers.Conv2D(512, kernel_size = 3, strides = 2, padding = 'same'),
-            layers.BatchNormalization(),
-            layers.PReLU(),
-            layers.Conv2D(256, kernel_size = 3, strides = 2, padding = 'same'),
-            layers.BatchNormalization(),
-            layers.PReLU(),
-            layers.GlobalAveragePooling2D()
-        ])
-
-    def call(self, x):
-        x = self.input_layer(x)
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-        x = self.layer5(x)
-        x = self.layer6(x)
-        x = self.last_layer(x)
-        return x
+def get_model(static_input, moving_input):
     
-## AFFINE NETWORK
-class Affine_Network(tf.keras.Model):
-    def __init__(self):
-        super(Affine_Network, self).__init__()
+    s = layers.Conv2D(64, kernel_size = 7, strides = 2,
+                      padding = 'same', kernel_regularizer = 'l2', activation = 'relu')(static_input)
+    s = Feature_Extractor(s, 64)
+    s = Feature_Extractor(s, 128)
+    s = Feature_Extractor(s, 128)
+    s = Feature_Extractor(s, 256)
+    s = Feature_Extractor(s, 256)
+    s = Feature_Extractor(s, 512)
+    s = Final_FELayer(s)
 
-        self.feature_extractor = Feature_Extractor()
-        self.regression_network = Regression_Network()
-    
-    def call(self, X):
-        x = self.feature_extractor(X[0])
-        x2 = self.feature_extractor(X[1])
-        x = layers.Concatenate(axis = -1)([x, x2])
-        x = self.regression_network(x)
-        return x
+    m = layers.Conv2D(64, kernel_size = 7, strides = 2,
+                      padding = 'same', kernel_regularizer = 'l2', activation = 'relu')(moving_input)
+    m = Feature_Extractor(m, 64)
+    m = Feature_Extractor(m, 128)
+    m = Feature_Extractor(m, 128)
+    m = Feature_Extractor(m, 256)
+    m = Feature_Extractor(m, 256)
+    m = Feature_Extractor(m, 512)
+    m = Final_FELayer(m)
+
+    x = layers.Concatenate(axis = -1)([s, m])
+    x = layers.Dense(3, activation = 'linear')(x)
+
+    model = tf.keras.Model(inputs = [static_input, moving_input], outputs = x)
+    return model

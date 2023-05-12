@@ -1,12 +1,13 @@
 # IMPORTS
 import numpy as np
-from tensorflow.keras.utils import plot_model, model_to_dot
-from tensorflow.keras import callbacks, models, optimizers, losses, metrics
+import tensorflow as tf
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras import callbacks, models, optimizers, losses, metrics, Input
 import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
 from init_datasets import validset, trainset
-from network import Affine_Network
+from network import get_model
 
 # Load Data
 print('** LOADING DATASET **')
@@ -31,9 +32,9 @@ print(f'Validation: \n\tX Static Shape: {valid_sx.shape} \n\tX Moving Shape: {va
 
 # Load Model
 print('** BUILDING MODEL **')
-model = Affine_Network()
+model = get_model(Input(shape = (256, 256, 3)), Input(shape = (256, 256, 3)))
 
-lr_schedule = optimizers.schedules.InverseTimeDecay(0.0001, decay_rate = 1, decay_steps = 10)
+lr_schedule = optimizers.schedules.InverseTimeDecay(0.00001, decay_rate = 1, decay_steps = 15)
 opt = optimizers.Adam(learning_rate = lr_schedule)
 loss = losses.MeanSquaredLogarithmicError(name = 'log_mse')
 metric = ['accuracy', metrics.RootMeanSquaredError(name = 'rmse'), losses.MeanSquaredError(name = 'mse')]
@@ -42,14 +43,14 @@ model.compile(optimizer = opt, loss = loss, metrics = metric)
 
 # Train Model
 print('** TRAINING **')
-callback = callbacks.EarlyStopping(monitor = 'val_loss', patience = 5, restore_best_weights = True)
+callback = callbacks.EarlyStopping(monitor = 'val_loss', patience = 5)
 
 history = model.fit([train_sx, train_mx], train_y, 
                     validation_data = ([valid_sx, valid_mx], valid_y),
-                    batch_size = 18, epochs = 150,
+                    batch_size = 32, epochs = 200,
                     callbacks = [callback])
 # model.summary()
-models.save_model(model, 'stratified_input_AN')
+model.save('multi_affine.h5')
 plot_model(model, to_file = 'figures/strat_model_vis.png', show_shapes = True)
 
 # Results:
@@ -87,4 +88,3 @@ lf2.savefig('figures/SAN_metric_curve.png')
 # print('Truth Values Training Set Pair 1:\n\t', train_y[1])
 
 plot_model(model, to_file = 'figures/strat_model_vis.png', show_shapes = True)
-model_to_dot(model, show_shapes = True)
