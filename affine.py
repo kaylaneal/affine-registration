@@ -1,6 +1,5 @@
 # IMPORTS
 import numpy as np
-import tensorflow as tf
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import callbacks, models, optimizers, losses, metrics, Input
 import matplotlib.pyplot as plt
@@ -26,31 +25,32 @@ valid_mx = np.array(valid_mx)
 valid_y = np.array(valid_y)
 
 # Check Data
-
+'''
 print(f'Training: \n\tX Static Shape: {train_sx.shape} \n\tX Moving Shape: {train_mx.shape} \n\tY Shape: {train_y.shape}')
 print(f'Validation: \n\tX Static Shape: {valid_sx.shape} \n\tX Moving Shape: {valid_mx.shape} \n\tY Shape: {valid_y.shape}')
-
+'''
 # Load Model
 print('** BUILDING MODEL **')
 model = get_model(Input(shape = (256, 256, 3)), Input(shape = (256, 256, 3)))
 
-lr_schedule = optimizers.schedules.InverseTimeDecay(0.00001, decay_rate = 1, decay_steps = 15)
+lr_schedule = optimizers.schedules.ExponentialDecay(0.0001, decay_rate = 0.8, decay_steps = 1000, staircase = True)
 opt = optimizers.Adam(learning_rate = lr_schedule)
 loss = losses.MeanSquaredLogarithmicError(name = 'log_mse')
-metric = ['accuracy', metrics.RootMeanSquaredError(name = 'rmse'), losses.MeanSquaredError(name = 'mse')]
+metric = ['accuracy', metrics.RootMeanSquaredError(name = 'rmse')]
 
 model.compile(optimizer = opt, loss = loss, metrics = metric)
 
 # Train Model
 print('** TRAINING **')
-callback = callbacks.EarlyStopping(monitor = 'val_loss', patience = 5)
+escb = callbacks.EarlyStopping(monitor = 'val_loss', patience = 3, restore_best_weights = True)
+lcb = callbacks.CSVLogger('training_log.csv')
 
 history = model.fit([train_sx, train_mx], train_y, 
                     validation_data = ([valid_sx, valid_mx], valid_y),
-                    batch_size = 32, epochs = 200,
-                    callbacks = [callback])
+                    batch_size = 32, epochs = 250,
+                    callbacks = [escb, lcb])
 # model.summary()
-model.save('multi_affine.h5')
+models.save_model(model, 'multi_affine')
 plot_model(model, to_file = 'figures/strat_model_vis.png', show_shapes = True)
 
 # Results:
@@ -71,20 +71,13 @@ plt.title('MSLE Loss Curve')
 lf.savefig('figures/SAN_loss_curve.png')
 
 lf2 = plt.figure()
-lf2.add_subplot(211)
+lf2.add_subplot(111)
 plt.plot(history.history['rmse'])
 plt.plot(history.history['val_rmse'])
 plt.legend(['training', 'validation'])
 plt.title('RMSE Loss Curve')
-lf2.add_subplot(212)
-plt.plot(history.history['mse'])
-plt.plot(history.history['val_mse'])
-plt.legend(['training', 'validation'])
-plt.title('MSE Loss Curve')
 lf2.tight_layout()
 lf2.savefig('figures/SAN_metric_curve.png')
 
 # print('Truth Values Training Set Pair 0:\n\t', train_y[0])
 # print('Truth Values Training Set Pair 1:\n\t', train_y[1])
-
-plot_model(model, to_file = 'figures/strat_model_vis.png', show_shapes = True)

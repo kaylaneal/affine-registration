@@ -72,17 +72,31 @@ class PerfectPairDataset:
         y = np.array(y)
         a = np.array(a)
         
-        x = ((x - np.min(x)) / (np.max(x) - np.min(x)))
-        y = ((y - np.min(y)) / (np.max(y) - np.min(y)))
-        a = ((a - np.min(a)) / (np.max(a) - np.min(a)))
+        x, self.min_x, self.max_x = normalize(x)
+        y, self.min_y, self.max_y = normalize(y)
+        a, self.min_a, self.max_a = normalize(a)
 
         label = []
         for idx in range(len(x)):
             label.append([x[idx], y[idx], a[idx]])
         
         return label
+
     
 def create_dataset(json_file):
     dataset = PerfectPairDataset(json_file)
 
     return dataset
+
+def normalize(data):
+    min_d = np.min(data)
+    max_d = np.max(data)
+
+    norm = ((data - min_d) / (max_d - min_d))
+
+    return norm, min_d, max_d
+
+def denormalize(norm, min, max):
+    denorm = (norm * ((max - min) + min))
+
+    return denorm
