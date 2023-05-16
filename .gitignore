@@ -5,3 +5,5 @@ docs/
 init_datasets.py
 
 explore_dataset.py
+
+initial_network.py

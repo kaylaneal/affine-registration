@@ -5,8 +5,8 @@ from tensorflow.keras import callbacks, models, optimizers, losses, metrics
 import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
-from create_datasets import validset, trainset
-from network import Affine_Network
+from init_datasets import validset, trainset
+from initial_network import Affine_Network
 
 ## MODEL
 print('** BUILDING MODEL **')
