@@ -29,7 +29,6 @@ class PerfectPairDataset:
         self.path = os.path.dirname(json)
         self.images = {}
         self.labels = {}
-        self.xya = {}
 
         self.add_pairs()
     
@@ -38,13 +37,10 @@ class PerfectPairDataset:
             self.images.update({
                 idx : [os.path.join(self.path, r['staticImage']), os.path.join(self.path, r['movingImage'])]
             })
-            self.labels.update({
-                            idx : [r['deltaTheta'], r['deltaXviewport'], r['deltaYviewport']]
-                            })
-            self.xya.update({
+            self.labels.update({                
                 idx : (r['x'], r['y'], r['a'])
             })
-    
+
     '''
     def segment_mask(self):
         for idx, p in self.pairs.items():

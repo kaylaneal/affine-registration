@@ -3,7 +3,7 @@ __pycache__
 trainingdata/
 
 sampler.py
-
+rotation.py
 inital_rotation.py
 
 .DS_Store
