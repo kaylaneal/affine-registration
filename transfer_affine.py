@@ -62,34 +62,3 @@ plt.legend(['rotation', 'x translation', 'y translation'], loc = 'upper left')
 
 fig.tight_layout()
 fig.savefig('transferlearn_figs/loss_curves.png')
-
-## Results
-test_s = train_sx[:3]
-test_m = train_mx[:3]
-test_labels = train_y[:3]
-
-pred = model.predict([test_s, test_m])
-
-test_fig = plt.figure(figsize = (24, 24))
-
-test_fig.add_subplot(1, 3, 1)
-plt.imshow(np.concatenate((test_s[0], test_m[0])))
-plt.axis('off')
-plt.title(f'Truth: {test_labels[0]}\nPredicted: {np.asarray(pred[0])}')
-
-test_fig.add_subplot(1, 3, 2)
-plt.imshow(np.concatenate((test_s[1], test_m[1])))
-plt.axis('off')
-plt.title(f'Truth: {test_labels[1]}\nPredicted: {np.asarray(pred[1])}')
-
-test_fig.add_subplot(1, 3, 3)
-plt.imshow(np.concatenate((test_s[2], test_m[2])))
-plt.axis('off')
-plt.title(f'Truth: {test_labels[2]}\nPredicted: {np.asarray(pred[2])}')
-
-test_fig.tight_layout()
-test_fig.savefig('transferlearn_figs/test_imgs.png')
-
-print(f'TEST IMAGE 1\nTruth Label: {test_labels[0]} --> Predicted Label: [{np.asarray(pred[0])}')
-print(f'TEST IMAGE 2\nTruth Label: {test_labels[1]} --> Predicted Label: [{np.asarray(pred[1])}]')
-print(f'TEST IMAGE 3\nTruth Label: {test_labels[2]} --> Predicted Label: [{np.asarray(pred[2])}]')
