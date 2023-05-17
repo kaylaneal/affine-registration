@@ -1,29 +1,29 @@
 from dataset import create_dataset
 
 # Data Paths:
-json_1 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (1)/info.json'
-images_1 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (1)'
+json_1 = 'trainingdata/perfectpairs/image-sets (1)/info.json'
+images_1 = 'trainingdata/perfectpairs/image-sets (1)'
 
-json_2 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (2)/info.json'
-images_2 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (2)'
+json_2 = 'trainingdata/perfectpairs/image-sets (2)/info.json'
+images_2 = 'trainingdata/perfectpairs/image-sets (2)'
 
-json_3 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (3)/info.json'
-images_3 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (3)'
+json_3 = 'trainingdata/perfectpairs/image-sets (3)/info.json'
+images_3 = 'trainingdata/perfectpairs/image-sets (3)'
 
-json_4 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (4)/info.json'
-images_4 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (4)'
+json_4 = 'trainingdata/perfectpairs/image-sets (4)/info.json'
+images_4 = 'trainingdata/perfectpairs/image-sets (4)'
 
-json_5 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (5)/info.json'
-images_5 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (5)'
+json_5 = 'trainingdata/perfectpairs/image-sets (5)/info.json'
+images_5 = 'trainingdata/perfectpairs/image-sets (5)'
 
-json_6 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (6)/info.json'
-images_6 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (6)'
+json_6 = 'trainingdata/perfectpairs/image-sets (6)/info.json'
+images_6 = 'trainingdata/perfectpairs/image-sets (6)'
 
-json_7 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (7)/info.json'
-images_7 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (7)'
+json_7 = 'trainingdata/perfectpairs/image-sets (7)/info.json'
+images_7 = 'trainingdata/perfectpairs/image-sets (7)'
 
-json_8 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (8)/info.json'
-images_8 = '../pearce-lab/registration/trainingdata/perfectpairs/image-sets (8)'
+json_8 = 'trainingdata/perfectpairs/image-sets (8)/info.json'
+images_8 = 'trainingdata/perfectpairs/image-sets (8)'
 
 # Create Datasets:
 testset = create_dataset(json_1)
