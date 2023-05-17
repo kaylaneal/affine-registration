@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tensorflow.keras import optimizers, models, losses, callbacks
+from tensorflow.keras import models, optimizers
 
 ## LOCAL IMPORTS
 from init_datasets import trainset, validset
@@ -23,30 +23,73 @@ valid_y = np.array(validset.process_labels())
 # Training
 print('*** TRAINING MODEL ***')
 
-lr_schedule = optimizers.schedules.ExponentialDecay(initial_learning_rate = 0.001, decay_rate = 1, decay_steps = 40)
-opt = optimizers.Adam(learning_rate = lr_schedule)
-
-model.compile(optimizer = opt, loss = 'mse', metrics = ['accuracy'])
-history = model.fit([train_sx, train_mx], train_y, 
-                    validation_data = ([valid_sx, valid_mx], valid_y),
-                    batch_size = 32, epochs = 50,
-                    callbacks = [callbacks.EarlyStopping(patience = 5, restore_best_weights = True)])
+model.compile(optimizer = optimizers.Adam(), loss = 'mse', metrics = ['mae'])
+history = model.fit([train_sx, train_mx], [train_y[:, 0], train_y[:, 1], train_y[:, 2]], 
+                    validation_data = ([valid_sx, valid_mx], [valid_y[:, 0], valid_y[:, 1], valid_y[:, 2]]),
+                    batch_size = 32, epochs = 75)
 
 models.save_model(model, 'transfer_affine')
 
 # Plot Results
-plt.plot(history.history['accuracy'])
-plt.plot(history.history['val_accuracy'])
-plt.legend(['training', 'validation'])
-plt.title('Accuracy Curve')
-plt.savefig('transferlearn_figs/accuracy.png')
+print('*** ANALYZING RESULTS ***')
+fig = plt.figure(figsize = (12, 12))
 
-plt.clf()
-
+fig.add_subplot(3, 1, 1)
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
-plt.legend(['training', 'validation'])
-plt.title('Mean Squared Error Loss Curve')
-plt.savefig('transferlearn_figs/mse.png')
+plt.title('Model Loss Curve')
+plt.xlabel('epoch')
+plt.ylabel('loss')
+plt.legend(['train', 'validation'], loc = 'upper left')
 
-plt.clf()
+fig.add_subplot(3, 1, 2)
+plt.plot(history.history['rotation_loss'])
+plt.plot(history.history['x_trans_loss'])
+plt.plot(history.history['y_trans_loss'])
+plt.title('Transformation Loss Curve')
+plt.xlabel('epoch')
+plt.ylabel('loss')
+plt.legend(['rotation', 'x translation', 'y translation'], loc = 'upper left')
+
+fig.add_subplot(3, 1, 3)
+plt.plot(history.history['val_rotation_loss'])
+plt.plot(history.history['val_x_trans_loss'])
+plt.plot(history.history['val_y_trans_loss'])
+plt.title('VALIDATION Transformation Loss Curve')
+plt.xlabel('epoch')
+plt.ylabel('loss')
+plt.legend(['rotation', 'x translation', 'y translation'], loc = 'upper left')
+
+fig.tight_layout()
+fig.savefig('transferlearn_figs/loss_curves.png')
+
+## Results
+test_s = train_sx[:3]
+test_m = train_mx[:3]
+test_labels = train_y[:3]
+
+pred = model.predict([test_s, test_m])
+
+test_fig = plt.figure(figsize = (24, 24))
+
+test_fig.add_subplot(1, 3, 1)
+plt.imshow(np.concatenate((test_s[0], test_m[0])))
+plt.axis('off')
+plt.title(f'Truth: {test_labels[0]}\nPredicted: {np.asarray(pred[0])}')
+
+test_fig.add_subplot(1, 3, 2)
+plt.imshow(np.concatenate((test_s[1], test_m[1])))
+plt.axis('off')
+plt.title(f'Truth: {test_labels[1]}\nPredicted: {np.asarray(pred[1])}')
+
+test_fig.add_subplot(1, 3, 3)
+plt.imshow(np.concatenate((test_s[2], test_m[2])))
+plt.axis('off')
+plt.title(f'Truth: {test_labels[2]}\nPredicted: {np.asarray(pred[2])}')
+
+test_fig.tight_layout()
+test_fig.savefig('transferlearn_figs/test_imgs.png')
+
+print(f'TEST IMAGE 1\nTruth Label: {test_labels[0]} --> Predicted Label: [{np.asarray(pred[0])}')
+print(f'TEST IMAGE 2\nTruth Label: {test_labels[1]} --> Predicted Label: [{np.asarray(pred[1])}]')
+print(f'TEST IMAGE 3\nTruth Label: {test_labels[2]} --> Predicted Label: [{np.asarray(pred[2])}]')
