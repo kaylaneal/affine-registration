@@ -5,7 +5,7 @@ import tensorflow as tf
 import numpy as np
 
 ## LOCAL IMPORTS
-from init_datasets import trainset
+from DHR_insp.init_datasets import trainset
 
 # Show Truth and Inputs:
 

@@ -1,4 +1,4 @@
-from dataset import create_dataset
+from DHR_insp.dataset import create_dataset
 
 # Data Paths:
 json_1 = 'trainingdata/perfectpairs/image-sets (1)/info.json'

@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import scipy.ndimage as nd
 ## LOCAL IMPORTS
-import utils
+import DHR_insp.utils as utils
 
 '''
 JSON KEYS // DATAFRAME COL NAMES:

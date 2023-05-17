@@ -2,7 +2,7 @@
 import tensorflow as tf
 
 ## LOCAL IMPORTS
-from evaluate import test_x
+from DHR_insp.evaluate import test_x
 
 # Load Model
 model = tf.keras.models.load_model('AffineNet')

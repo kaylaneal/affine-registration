@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
-from init_datasets import validset, trainset
-from network import Affine_Network
+from DHR_insp.init_datasets import validset, trainset
+from DHR_insp.network import Affine_Network
 
 # Load/Preprocess Datasets
 print('*** PREPROCESSING ***')

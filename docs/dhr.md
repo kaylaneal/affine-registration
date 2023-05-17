@@ -4,6 +4,16 @@ Proposes a deep network to calculate the initial affine transform between histol
 
 <br>
 
+[DeepHistReg](https://github.com/MWod/DeepHistReg), as defined in:
+- [Affine Registration Paper](https://link.springer.com/chapter/10.1007/978-3-030-50120-4_2)
+- and Subsequent Papers: 
+
+   - [i.](https://link.springer.com/chapter/10.1007/978-3-030-59861-7_49)  
+    
+   - [ii.](https://www.sciencedirect.com/science/article/pii/S0169260720316321)
+
+<br>
+
 1. **Preprocessing**
     - Smoothing and Resampling to lower resolution
     - Segment tissue from background

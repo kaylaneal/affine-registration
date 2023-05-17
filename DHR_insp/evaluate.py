@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 
 ## LOCAL IMPORTS
-from init_datasets import testset
+from DHR_insp.init_datasets import testset
 
 # Load / Preprocess Test Dataset
 print('*** Preprocessing Testing Set ***')
