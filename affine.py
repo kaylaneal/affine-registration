@@ -33,7 +33,7 @@ print(f'Validation: \n\tX Static Shape: {valid_sx.shape} \n\tX Moving Shape: {va
 print('** BUILDING MODEL **')
 model = get_model(Input(shape = (256, 256, 3)), Input(shape = (256, 256, 3)))
 
-lr_schedule = optimizers.schedules.ExponentialDecay(0.0001, decay_rate = 0.8, decay_steps = 1000, staircase = True)
+lr_schedule = optimizers.schedules.ExponentialDecay(0.0001, decay_rate = 1, decay_steps = 500, staircase = True)
 opt = optimizers.Adam(learning_rate = lr_schedule)
 loss = losses.MeanSquaredLogarithmicError(name = 'log_mse')
 metric = ['accuracy', metrics.RootMeanSquaredError(name = 'rmse')]
@@ -42,7 +42,7 @@ model.compile(optimizer = opt, loss = loss, metrics = metric)
 
 # Train Model
 print('** TRAINING **')
-escb = callbacks.EarlyStopping(monitor = 'val_loss', patience = 3, restore_best_weights = True)
+escb = callbacks.EarlyStopping(monitor = 'val_loss', patience = 5, restore_best_weights = True)
 lcb = callbacks.CSVLogger('training_log.csv')
 
 history = model.fit([train_sx, train_mx], train_y, 
