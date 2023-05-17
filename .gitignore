@@ -1,10 +1,7 @@
-__pycache__
+__pycache__/
 
-trainingdata/
+docs/
 
-sampler.py
-rotation.py
-inital_rotation.py
+init_datasets.py
 
-.DS_Store
-
+explore_dataset.py

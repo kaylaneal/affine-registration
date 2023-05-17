@@ -1,8 +1,13 @@
-# Rigid Registration of 2D WSI Images
+# Rigid / Affine Registration of 2D Whole Slide Images (WSIs)
 
-- Using 'Perfect Pairs' dataset, containing 8 sets of 100 pairs of source and target images. 
-    - Perfect Pairs denotes the same image being used for both inputs, the difference being the rotation and translation of the source image. 
-    - Labels for each set is stored in `.json` format.
+## Dataset
+
+**Pefect Pairs Dataset**
+- Consists of 8 sets of images.
+    - Each image set contains 100 pairs of source and moving images.
+    - The source and moving image are the same image, the difference is in the rigid transformation between the images
+    - The transformations are *known*
+    - Each set has one `info.json` file, containing the image pair and the transformation label
 
 ## Objective:
 
