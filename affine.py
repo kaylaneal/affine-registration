@@ -42,12 +42,12 @@ model.compile(optimizer = opt, loss = loss, metrics = metric)
 
 # Train Model
 print('** TRAINING **')
-escb = callbacks.EarlyStopping(monitor = 'val_loss', patience = 5, restore_best_weights = True)
+escb = callbacks.EarlyStopping(monitor = 'val_loss', patience = 8, restore_best_weights = True)
 lcb = callbacks.CSVLogger('training_log.csv')
 
 history = model.fit([train_sx, train_mx], train_y, 
                     validation_data = ([valid_sx, valid_mx], valid_y),
-                    batch_size = 32, epochs = 250,
+                    batch_size = 32, epochs = 200,
                     callbacks = [escb, lcb])
 # model.summary()
 models.save_model(model, 'multi_affine')
