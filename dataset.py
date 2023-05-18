@@ -87,8 +87,8 @@ def create_dataset(json_file):
     return dataset
 
 def normalize(data):
-    min_d = np.min(data)
-    max_d = np.max(data)
+    min_d = min(data)
+    max_d = max(data)
 
     norm = ((data - min_d) / (max_d - min_d))
 

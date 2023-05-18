@@ -23,25 +23,13 @@ predictions = model.predict([test_s, test_m])
 
 ## PLOTTING:
 print('Plotting Test Results')
-test_fig = plt.figure(figsize = (24, 24))
 
-test_fig.add_subplot(131)
-plt.imshow(np.concatenate((test_s[0], test_m[0])))
+plt.imshow(np.concatenate((test_s[0], test_m[0]), axis = 1))
+plt.suptitle('Testset Image Pair 0')
 plt.title(f'Truth Label: {test_y[0]}')
 plt.axis('off')
-
-test_fig.add_subplot(132)
-plt.imshow(np.concatenate((test_s[1], test_m[1])))
-plt.title(f'Truth Label: {test_y[1]}')
-plt.axis('off')
-
-test_fig.add_subplot(133)
-plt.imshow(np.concatenate((test_s[2], test_m[2])))
-plt.title(f'Truth Label: {test_y[2]}')
-plt.axis('off')
-
-test_fig.tight_layout()
-test_fig.savefig('transferlearn_figs/test_imgs.png')
+plt.savefig('transferlearn_figs/test_imgs.png')
+plt.clf()
 
 print(f'TEST IMAGE 1\nTruth Label: {test_y[0]} --> Predicted Label: [{float(predictions[0][0]), float(predictions[1][0]), float(predictions[2][0])}]')
 print(f'TEST IMAGE 2\nTruth Label: {test_y[1]} --> Predicted Label: [{float(predictions[0][1]), float(predictions[1][1]), float(predictions[2][1])}]')
