@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 
 ## LOCAL IMPORTS
-from init_datasets import testset
+from base_models.stratified_input.init_datasets import testset
 from dataset import denormalize
 
 print('** LOADING TRAINED MODEL **')

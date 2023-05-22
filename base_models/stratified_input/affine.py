@@ -5,7 +5,7 @@ from tensorflow.keras import callbacks, models, optimizers, losses, metrics, Inp
 import matplotlib.pyplot as plt
 
 ## LOCAL IMPORTS
-from init_datasets import validset, trainset
+from base_models.stratified_input.init_datasets import validset, trainset
 from network import get_model
 
 # Load Data
