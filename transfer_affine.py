@@ -23,10 +23,17 @@ valid_y = np.array(validset.process_labels())
 print('*** TRAINING MODEL ***')
 
 model.compile(optimizer = tf.keras.optimizers.Adam(), loss = 'mse', metrics = ['accuracy', 'mae'])
+
+t = 0
+for layer in model.layers:
+    if layer.trainable == True:
+        t += 1
+print(f'{t}/{len(model.layers)} are trainable.')
+
 history = model.fit([train_sx, train_mx], train_y, 
                     validation_data = ([valid_sx, valid_mx], valid_y),
-                    batch_size = 32, epochs = 30)
-
+                    batch_size = 16, epochs = 45)
+                    
 tf.keras.models.save_model(model, 'transfer_affine')
 
 # Plot Results
@@ -61,16 +68,49 @@ plt.clf()
 
 mse_loss, acc, mae_loss = model.evaluate([valid_sx, valid_mx], valid_y)
 print('Evaluation:')
-print(f'\tAccuracy: {acc * 100:.2f}')
+print(f'\tAccuracy: {acc * 100:.2f}%')
 print(f'\tMean Squared Error: {mse_loss:.2f}')
 print(f'\tMean Absolute Error: {mae_loss:.2f}')
 
 
-
 ## FINE TUNING
+print('** FINE TUNING **')
+
 base.trainable = True
 
-model.compile(optimizer = tf.keras.optimizers.Adam(1e-5), loss = 'mse', metrics = ['accuracy', 'mae'])
-model.fit([train_sx, train_mx], train_y,
+model.compile(optimizer = tf.keras.optimizers.Adam(1e-4), loss = 'mse', metrics = ['accuracy', 'mae'])
+
+t = 0
+for layer in model.layers:
+    if layer.trainable == True:
+        t += 1
+print(f'{t}/{len(model.layers)} are trainable.')
+
+ft_hist = model.fit([train_sx, train_mx], train_y,
           validation_data = ([valid_sx, valid_mx], valid_y),
-          batch_size = 32, epochs = 20)
+          batch_size = 16, epochs = 30,
+          callbacks = [tf.keras.callbacks.EarlyStopping(patience = 4, restore_best_weights = True)])
+
+plt.plot(ft_hist.history['loss'])
+plt.plot(ft_hist.history['val_loss'])
+plt.title('Fine Tune MSE Loss Curve')
+plt.xlabel('epoch')
+plt.ylabel('Mean Squared Error')
+plt.legend(['train', 'validation'], loc = 'upper right')
+plt.savefig('transferlearn_figs/ft_loss.png')
+plt.clf()
+
+plt.plot(ft_hist.history['accuracy'])
+plt.plot(ft_hist.history['val_accuracy'])
+plt.title('Fine Tune Accuracy Curve')
+plt.xlabel('epoch')
+plt.ylabel('accuracy')
+plt.legend(['train', 'validation'], loc = 'upper right')
+plt.savefig('transferlearn_figs/ft_acc.png')
+plt.clf()
+
+mse_loss, acc, mae_loss = model.evaluate([valid_sx, valid_mx], valid_y)
+print('Evaluation:')
+print(f'\tAccuracy: {acc * 100:.2f}%')
+print(f'\tMean Squared Error: {mse_loss:.2f}')
+print(f'\tMean Absolute Error: {mae_loss:.2f}')

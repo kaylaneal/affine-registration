@@ -14,14 +14,24 @@ test_s, test_m = testset.process_imgpairs()
 test_s = np.array(test_s)
 test_m = np.array(test_m)
 test_y = testset.process_labels()
-
+y = np.array(test_y)
 # Load Model
+print()
 print('** LOADING TRAINING MODEL **')
 model = load_model('transfer_affine')
 
+print()
+print('** EVALUATION **\n')
+mse, acc, mae = model.evaluate([test_s, test_m], y)
+print(f'\tMean Squared Error (LOSS): {mse:.2f}')
+print(f'\tAccuracy: {(acc * 100):.0f}%')
+
+print()
+print('** PREDICTION **')
 predictions = model.predict([test_s, test_m])
 
 ## PLOTTING:
+print()
 print('Plotting Test Results')
 
 plt.imshow(np.concatenate((test_s[0], test_m[0]), axis = 1))
