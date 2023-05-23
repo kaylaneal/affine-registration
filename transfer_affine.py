@@ -2,11 +2,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tensorflow.keras import models, optimizers
-
+import tensorflow as tf
 ## LOCAL IMPORTS
 from init_datasets import trainset, validset
-from transfer_network import model
+from transfer_network import model, base
 
 # Data Loading and Preprocessing
 print('*** LOADING DATA ***')
@@ -23,12 +22,12 @@ valid_y = np.array(validset.process_labels())
 # Training
 print('*** TRAINING MODEL ***')
 
-model.compile(optimizer = optimizers.Adam(learning_rate = 0.0001), loss = 'mse', metrics = ['mae'])
-history = model.fit([train_sx, train_mx], [train_y[:, 0], train_y[:, 1], train_y[:, 2]], 
-                    validation_data = ([valid_sx, valid_mx], [valid_y[:, 0], valid_y[:, 1], valid_y[:, 2]]),
-                    batch_size = 32, epochs = 75)
+model.compile(optimizer = tf.keras.optimizers.Adam(), loss = 'mse', metrics = ['accuracy', 'mae'])
+history = model.fit([train_sx, train_mx], train_y, 
+                    validation_data = ([valid_sx, valid_mx], valid_y),
+                    batch_size = 32, epochs = 30)
 
-models.save_model(model, 'transfer_affine')
+tf.keras.models.save_model(model, 'transfer_affine')
 
 # Plot Results
 print('*** ANALYZING RESULTS ***')
@@ -63,3 +62,13 @@ plt.legend(['rotation', 'x translation', 'y translation'], loc = 'upper left')
 
 fig.tight_layout()
 fig.savefig('transferlearn_figs/transformation_losses.png')
+
+
+
+## FINE TUNING
+base.trainable = True
+
+model.compile(optimizer = tf.keras.optimizers.Adam(1e-5), loss = 'mse', metrics = ['accuracy', 'mae'])
+model.fit([train_sx, train_mx], train_y,
+          validation_data = ([valid_sx, valid_mx], valid_y),
+          batch_size = 32, epochs = 20)
