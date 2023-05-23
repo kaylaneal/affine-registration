@@ -1,6 +1,6 @@
 __pycache__/
 
-docs/
+.DS_Store
 
 init_datasets.py
 

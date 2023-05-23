@@ -31,9 +31,9 @@ plt.axis('off')
 plt.savefig('transferlearn_figs/test_imgs.png')
 plt.clf()
 
-print(f'TEST IMAGE 1\nTruth Label: {test_y[0]} --> Predicted Label: [{float(predictions[0][0]), float(predictions[1][0]), float(predictions[2][0])}]')
-print(f'TEST IMAGE 2\nTruth Label: {test_y[1]} --> Predicted Label: [{float(predictions[0][1]), float(predictions[1][1]), float(predictions[2][1])}]')
-print(f'TEST IMAGE 3\nTruth Label: {test_y[2]} --> Predicted Label: [{float(predictions[0][2]), float(predictions[1][2]), float(predictions[2][2])}]')
+print(f'TEST IMAGE 1\nTruth Label: {test_y[0]} --> Predicted Label: [{float(predictions[0][0]), float(predictions[0][1]), float(predictions[0][2])}]')
+print(f'TEST IMAGE 2\nTruth Label: {test_y[1]} --> Predicted Label: [{float(predictions[1][0]), float(predictions[1][1]), float(predictions[1][2])}]')
+print(f'TEST IMAGE 3\nTruth Label: {test_y[2]} --> Predicted Label: [{float(predictions[2][0]), float(predictions[2][1]), float(predictions[2][2])}]')
 
 decoded_predictions = []
 for p in predictions:
@@ -46,5 +46,4 @@ for p in predictions:
 
 print()
 print(f'Truth Value: {testset.labels[0]}')
-print(f'Decoded Prediction: [{float(decoded_predictions[0][0])}, {float(decoded_predictions[1][0])}, {float(decoded_predictions[2][0])}]')
-
+print(f'Decoded Prediction: [{float(decoded_predictions[0][0])}, {float(decoded_predictions[0][1])}, {float(decoded_predictions[0][2])}]')

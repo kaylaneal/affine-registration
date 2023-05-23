@@ -6,16 +6,14 @@ from PIL import Image
 
 '''
 JSON KEYS // DATAFRAME COL NAMES:
-a
-x
-y
-staticImage
-movingImage
+a   x   y
+staticImage     movingImage
 '''
 
 # Images read in at size (256, 256)
     # Image Array at shape (256, 256, 4)
     # As grayscale ('L') shape is (256, 256)
+    # RGB shape is (256, 256, 3)
 
 class PerfectPairDataset:
     def __init__(self, json):
@@ -87,14 +85,14 @@ def create_dataset(json_file):
     return dataset
 
 def normalize(data):
-    min_d = min(data)
-    max_d = max(data)
+    min_d = float(min(data))
+    max_d = float(max(data))
 
     norm = ((data - min_d) / (max_d - min_d))
 
     return norm, min_d, max_d
 
 def denormalize(norm, min, max):
-    denorm = (norm * ((max - min) + min))
+    denorm = (norm * (max - min) + min)
 
     return denorm
