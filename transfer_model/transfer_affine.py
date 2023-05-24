@@ -28,13 +28,13 @@ t = 0
 for layer in model.layers:
     if layer.trainable == True:
         t += 1
-print(f'{t}/{len(model.layers)} are trainable.')
+print(f'{t}/{len(model.layers)} layers are trainable.')
 
 history = model.fit([train_sx, train_mx], train_y, 
                     validation_data = ([valid_sx, valid_mx], valid_y),
-                    batch_size = 16, epochs = 35)
+                    batch_size = 32, epochs = 35)
                     
-tf.keras.models.save_model(model, 'transfer_affine')
+# tf.keras.models.save_model(model, 'transfer_model/transfer_affine')
 
 # Plot Results
 print('*** ANALYZING RESULTS ***')
@@ -45,7 +45,7 @@ plt.title('MSE Loss Curve')
 plt.xlabel('epoch')
 plt.ylabel('Mean Squared Error')
 plt.legend(['train', 'validation'], loc = 'upper right')
-plt.savefig('transferlearn_figs/loss.png')
+plt.savefig('transfer_model/transferlearn_figs/loss.png')
 plt.clf()
 
 plt.plot(history.history['mae'])
@@ -54,7 +54,7 @@ plt.title('MAE Metrics Curve')
 plt.xlabel('epoch')
 plt.ylabel('Mean Absolute Error')
 plt.legend(['train', 'validation'], loc = 'upper right')
-plt.savefig('transferlearn_figs/mae.png')
+plt.savefig('transfer_model/transferlearn_figs/mae.png')
 plt.clf()
 
 mse_loss, mae_loss = model.evaluate([valid_sx, valid_mx], valid_y)
@@ -73,7 +73,7 @@ t = 0
 for layer in model.layers:
     if layer.trainable == True:
         t += 1
-print(f'{t}/{len(model.layers)} are trainable.')
+print(f'{t}/{len(model.layers)} layers are trainable.')
 
 ft_hist = model.fit([train_sx, train_mx], train_y,
           validation_data = ([valid_sx, valid_mx], valid_y),
@@ -88,7 +88,7 @@ plt.title('Fine Tune MSE Loss Curve')
 plt.xlabel('epoch')
 plt.ylabel('Mean Squared Error')
 plt.legend(['train', 'validation'], loc = 'upper right')
-plt.savefig('transferlearn_figs/ft_loss.png')
+plt.savefig('transfer_model/transferlearn_figs/ft_loss.png')
 plt.clf()
 
 plt.plot(ft_hist.history['mae'])
@@ -97,10 +97,12 @@ plt.title('Fine Tune MAE Metrics Curve')
 plt.xlabel('epoch')
 plt.ylabel('Mean Absolute Error')
 plt.legend(['train', 'validation'], loc = 'upper right')
-plt.savefig('transferlearn_figs/ft_mae.png')
+plt.savefig('transfer_model/transferlearn_figs/ft_mae.png')
 plt.clf()
 
 mse_loss, mae_loss = model.evaluate([valid_sx, valid_mx], valid_y)
 print('Evaluation:')
 print(f'\tMean Squared Error: {mse_loss:.2f}')
 print(f'\tMean Absolute Error: {mae_loss:.2f}')
+
+tf.keras.models.save_model(model, 'transfer_model/transfer_affine')

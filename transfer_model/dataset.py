@@ -34,8 +34,8 @@ class PerfectPairDataset:
                 idx : os.path.join(self.path, r['movingImage'])
             })
             self.labels.update({
-                            idx : [r['x'], r['y'], r['a']]
-                            })
+                idx : [r['x'], r['y'], r['a']]
+            })
     
     def process_imgpairs(self):
         staticX, movingX = [], []

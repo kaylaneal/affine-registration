@@ -18,7 +18,7 @@ y = np.array(test_y)
 # Load Model
 print()
 print('** LOADING TRAINING MODEL **')
-model = load_model('transfer_affine')
+model = load_model('transfer_model/transfer_affine')
 
 print()
 print('** EVALUATION **\n')
@@ -34,10 +34,10 @@ print()
 print('Plotting Test Results')
 
 plt.imshow(np.concatenate((test_s[0], test_m[0]), axis = 1))
-plt.suptitle('Testset Image Pair 0')
-plt.title(f'Truth Label: {test_y[0]}')
+plt.title(f'Test Pair 0:\nTruth Label: [{testset.labels[0][0]:.2f}, {testset.labels[0][1]:.2f}, {testset.labels[0][2]:.2f}]')
 plt.axis('off')
-plt.savefig('transferlearn_figs/test_imgs.png')
+plt.savefig('transfer_model/transferlearn_figs/test_imgs.png')
+plt.tight_layout()
 plt.clf()
 
 print(f'TEST IMAGE 1\nTruth Label: {test_y[0]} --> Predicted Label: [{float(predictions[0][0]), float(predictions[0][1]), float(predictions[0][2])}]')
