@@ -12,7 +12,6 @@ staticImage     movingImage
 
 # Images read in at size (256, 256)
     # Image Array at shape (256, 256, 4)
-    # As grayscale ('L') shape is (256, 256)
     # RGB shape is (256, 256, 3)
 
 class PerfectPairDataset:
@@ -38,23 +37,23 @@ class PerfectPairDataset:
             })
     
     def process_imgpairs(self):
-        staticX, movingX = [], []
+        self.pairs, p = [], []
 
-        for idx in self.static.values():
-            s = Image.open(idx).convert('RGB')
+        for i in range(len(self.static.keys())):
+            s = self.static.get(i)
+            m = self.moving.get(i)
+
+            s = Image.open(s).convert('RGB')
             s = np.array(s)
-            s = s / 255.
-
-            staticX.append(s)
-
-        for idx in self.moving.values():
-            m = Image.open(idx).convert('RGB')
+            m = Image.open(m).convert('RGB')
             m = np.array(m)
+
+            s = s / 255.
             m = m / 255.
 
-            movingX.append(m)
-
-        return staticX, movingX
+            p.append(np.stack([s, m], axis = 0))
+        
+        self.pairs = np.stack([ps for ps in p], axis = 0)
     
     def process_labels(self):
         x, y, a = [], [], []
@@ -74,9 +73,13 @@ class PerfectPairDataset:
 
         label = []
         for idx in range(len(x)):
-            label.append([x[idx], y[idx], a[idx]])
+            label.append(np.stack([x[idx], y[idx], a[idx]], axis = 0))
         
-        return label
+        self.labels = np.stack([l for l in label], axis = 0)
+    
+    def process_data(self):
+        self.process_imgpairs()
+        self.process_labels()
 
     
 def create_dataset(json_file):

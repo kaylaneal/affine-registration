@@ -1,35 +1,38 @@
 # IMPORTS
 import tensorflow as tf
 
-# Build Model
+# Build Transfer Model
 print('*** BUILDING MODEL ***')
 
-# Base Model Instantiation
-base = tf.keras.applications.resnet.ResNet50(include_top = False, 
-                                             input_shape = (256, 256, 3), 
-                                             weights = 'imagenet')
-base.trainable = False
+inputs = tf.keras.Input(shape = (2, 256, 256, 3), name = 'images')
 
-# tf.keras.utils.plot_model(base, 'transfer_model/transferlearn_figs/rn50BASE.png')
+# Base Model Instantiation
+resnet = tf.keras.applications.resnet50.ResNet50(include_top = False, weights = 'imagenet', input_shape = (256, 256, 3))
+resnet.trainable = False
+
+# Base Model (processed) Output
+rout1 = resnet(inputs[:, 0], training = False)
+rout2 = resnet(inputs[:, 1], training = False)
+
+rout1 = tf.keras.layers.GlobalAveragePooling2D()(rout1)
+rout1 = tf.keras.layers.Dropout(0.3)(rout1)
+rout1 = tf.keras.layers.Flatten()(rout1)
+
+rout2 = tf.keras.layers.GlobalAveragePooling2D()(rout2)
+rout2 = tf.keras.layers.Dropout(0.3)(rout2)
+rout2 = tf.keras.layers.Flatten()(rout2)
+
+x = tf.keras.layers.Concatenate()([rout1, rout2])
 
 # Regression Head
-input_s = tf.keras.Input(shape = (256, 256, 3))
-input_m = tf.keras.Input(shape = (256, 256, 3))
-
-res_s_out = base(input_s, training = False)
-res_m_out = base(input_m, training = False)
-
-x = tf.keras.layers.Concatenate(axis = -1)([res_s_out, res_m_out])
-
-x = tf.keras.layers.GlobalAveragePooling2D()(x)
-
 x = tf.keras.layers.Dense(2048, activation = 'relu', kernel_regularizer = 'l2')(x)
 x = tf.keras.layers.Dense(1024, activation = 'relu', kernel_regularizer = 'l2')(x)
 x = tf.keras.layers.Dense(512, activation = 'relu', kernel_regularizer = 'l2')(x)
 x = tf.keras.layers.Dense(256, activation = 'relu', kernel_regularizer = 'l2')(x)
 
-x = tf.keras.layers.Dense(3, name = 'output')(x)
+output = tf.keras.layers.Dense(3, name = 'output')(x)
 
-model = tf.keras.Model(inputs = [input_s, input_m], outputs = x)
+model = tf.keras.Model(inputs = inputs, outputs = output)
+
 # model.summary()
 tf.keras.utils.plot_model(model, 'transfer_model/transferlearn_figs/rn_regress.png', show_shapes = True, show_layer_names = False)
