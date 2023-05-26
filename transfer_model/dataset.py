@@ -48,8 +48,8 @@ class PerfectPairDataset:
             m = Image.open(m).convert('RGB')
             m = np.array(m)
 
-            s = s / 255.
-            m = m / 255.
+            #s = s / 255.
+            #m = m / 255.
 
             p.append(np.stack([s, m], axis = 0))
         

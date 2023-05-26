@@ -1,5 +1,4 @@
 # IMPORTS
-import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
@@ -10,7 +9,7 @@ from transfer_network import model, resnet
 # Data Loading and Preprocessing
 print('*** LOADING DATA ***')
 trainset.process_data()
-train_x = trainset.pairs
+train_x = tf.keras.applications.resnet50.preprocess_input(trainset.pairs)
 train_y = trainset.labels
 
 if len(train_x) == len(train_y):
@@ -21,7 +20,7 @@ else:
     print(f'Train Y: {len(train_y)}')
 
 validset.process_data()
-valid_x = validset.pairs
+valid_x = tf.keras.applications.resnet50.preprocess_input(validset.pairs)
 valid_y = validset.labels
 
 if len(valid_x) == len(valid_y):
@@ -34,8 +33,7 @@ else:
 # Training
 print('*** TRAINING MODEL ***')
 
-lr_sched = tf.keras.optimizers.schedules.ExponentialDecay(1e-4, decay_steps = 100, decay_rate = 1)
-model.compile(optimizer = tf.keras.optimizers.Adam(lr_sched), loss = 'mse', metrics = ['mae'])
+model.compile(optimizer = tf.keras.optimizers.Adam(1e-4), loss = 'mse', metrics = ['mae'])
 
 t = 0
 for layer in model.layers:
@@ -45,11 +43,9 @@ print(f'{t}/{len(model.layers)} layers are trainable.')
 
 history = model.fit(train_x, train_y, 
                     validation_data = (valid_x, valid_y),
-                    batch_size = 32, epochs = 200,
-                    callbacks = [tf.keras.callbacks.EarlyStopping(patience = 10)])
+                    batch_size = 4, epochs = 200,
+                    callbacks = [tf.keras.callbacks.EarlyStopping(patience = 8)])
                     
-# tf.keras.models.save_model(model, 'transfer_model/transfer_affine')
-
 # Plot Results
 print('*** ANALYZING RESULTS ***')
 
@@ -71,18 +67,13 @@ plt.legend(['train', 'validation'], loc = 'upper right')
 plt.savefig('transfer_model/transferlearn_figs/mae.png')
 plt.clf()
 
-mse_loss, mae_loss = model.evaluate(valid_x, valid_y)
-print('Evaluation:')
-print(f'\tMean Squared Error: {mse_loss:.2f}')
-print(f'\tMean Absolute Error: {mae_loss:.2f}')
 
-'''
 ## FINE TUNING
 print('** FINE TUNING **')
 
 resnet.trainable = True
 
-model.compile(optimizer = tf.keras.optimizers.Adam(1e-4), loss = 'mse', metrics = ['mae'])
+model.compile(optimizer = tf.keras.optimizers.Adam(1e-5), loss = 'mse', metrics = ['mae'])
 
 t = 0
 for layer in model.layers:
@@ -92,7 +83,7 @@ print(f'{t}/{len(model.layers)} layers are trainable.')
 
 ft_hist = model.fit(train_x, train_y,
           validation_data = (valid_x, valid_y),
-          batch_size = 16, epochs = 30,
+          batch_size = 4, epochs = 30,
           callbacks = [tf.keras.callbacks.EarlyStopping(patience = 3, restore_best_weights = True)])
 
 print('*** ANALYZING TUNED RESULTS ***')
@@ -115,9 +106,4 @@ plt.legend(['train', 'validation'], loc = 'upper right')
 plt.savefig('transfer_model/transferlearn_figs/ft_mae.png')
 plt.clf()
 
-mse_loss, mae_loss = model.evaluate(valid_x, valid_y)
-print('Evaluation:')
-print(f'\tMean Squared Error: {mse_loss:.2f}')
-print(f'\tMean Absolute Error: {mae_loss:.2f}')
-'''
 tf.keras.models.save_model(model, 'transfer_model/transfer_affine')
