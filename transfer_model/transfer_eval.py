@@ -28,12 +28,11 @@ model = load_model('transfer_model/transfer_affine')
 
 print()
 print('** EVALUATION **\n')
-mse, mae = model.evaluate(test_x, test_y)
-print(f'\tMean Squared Error: {mse:.2f}')
+model.evaluate(test_x, test_y)
 
 print()
 print('** PREDICTION **')
-predictions = model.predict(test_x)
+predictions = model.predict(test_x, verbose = 2)
 
 # Prediction Exploration
 truth, pred = [], []  

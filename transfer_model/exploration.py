@@ -7,5 +7,4 @@ y = testset.labels
 model = tf.keras.models.load_model('transfer_model/transfer_affine')
 
 preds = model.predict(x)
-
 print(preds)

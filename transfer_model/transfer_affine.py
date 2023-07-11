@@ -4,7 +4,7 @@ import tensorflow as tf
 
 ## LOCAL IMPORTS
 from init_datasets import trainset, validset
-from transfer_network import model, resnet
+from transfer_network import model
 
 # Data Loading and Preprocessing
 print('*** LOADING DATA ***')
@@ -32,8 +32,8 @@ else:
 
 # Training
 print('*** TRAINING MODEL ***')
-
-model.compile(optimizer = tf.keras.optimizers.Adam(1e-4), loss = 'mse', metrics = ['mae'])
+opt = tf.keras.optimizers.schedules.ExponentialDecay(0.0001, decay_steps = 300, decay_rate = 1)
+model.compile(optimizer = tf.keras.optimizers.Adam(opt), loss = 'mse', metrics = ['accuracy'])
 
 t = 0
 for layer in model.layers:
@@ -43,7 +43,7 @@ print(f'{t}/{len(model.layers)} layers are trainable.')
 
 history = model.fit(train_x, train_y, 
                     validation_data = (valid_x, valid_y),
-                    batch_size = 4, epochs = 200,
+                    batch_size = 8, epochs = 200,
                     callbacks = [tf.keras.callbacks.EarlyStopping(patience = 8)])
                     
 # Plot Results
@@ -58,52 +58,14 @@ plt.legend(['train', 'validation'], loc = 'upper right')
 plt.savefig('transfer_model/transferlearn_figs/loss.png')
 plt.clf()
 
-plt.plot(history.history['mae'])
-plt.plot(history.history['val_mae'])
-plt.title('MAE Metrics Curve')
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Accuracy Curve')
 plt.xlabel('epoch')
-plt.ylabel('Mean Absolute Error')
+plt.ylabel('Accuracy')
 plt.legend(['train', 'validation'], loc = 'upper right')
-plt.savefig('transfer_model/transferlearn_figs/mae.png')
+plt.savefig('transfer_model/transferlearn_figs/acc.png')
 plt.clf()
 
-
-## FINE TUNING
-print('** FINE TUNING **')
-
-resnet.trainable = True
-
-model.compile(optimizer = tf.keras.optimizers.Adam(1e-5), loss = 'mse', metrics = ['mae'])
-
-t = 0
-for layer in model.layers:
-    if layer.trainable == True:
-        t += 1
-print(f'{t}/{len(model.layers)} layers are trainable.')
-
-ft_hist = model.fit(train_x, train_y,
-          validation_data = (valid_x, valid_y),
-          batch_size = 4, epochs = 30,
-          callbacks = [tf.keras.callbacks.EarlyStopping(patience = 3, restore_best_weights = True)])
-
-print('*** ANALYZING TUNED RESULTS ***')
-
-plt.plot(ft_hist.history['loss'])
-plt.plot(ft_hist.history['val_loss'])
-plt.title('Fine Tune MSE Loss Curve')
-plt.xlabel('epoch')
-plt.ylabel('Mean Squared Error')
-plt.legend(['train', 'validation'], loc = 'upper right')
-plt.savefig('transfer_model/transferlearn_figs/ft_loss.png')
-plt.clf()
-
-plt.plot(ft_hist.history['mae'])
-plt.plot(ft_hist.history['val_mae'])
-plt.title('Fine Tune MAE Metrics Curve')
-plt.xlabel('epoch')
-plt.ylabel('Mean Absolute Error')
-plt.legend(['train', 'validation'], loc = 'upper right')
-plt.savefig('transfer_model/transferlearn_figs/ft_mae.png')
-plt.clf()
 
 tf.keras.models.save_model(model, 'transfer_model/transfer_affine')

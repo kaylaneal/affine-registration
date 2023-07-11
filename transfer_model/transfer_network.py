@@ -15,26 +15,17 @@ rout1 = resnet(inputs[:, 0], training = False)
 rout2 = resnet(inputs[:, 1], training = False)
 
 rout1 = tf.keras.layers.GlobalAveragePooling2D()(rout1)
-rout1 = tf.keras.layers.Dropout(0.4)(rout1)
-rout1 = tf.keras.layers.Flatten()(rout1)
+rout1 = tf.keras.layers.Dropout(0.2)(rout1)
 
 rout2 = tf.keras.layers.GlobalAveragePooling2D()(rout2)
-rout2 = tf.keras.layers.Dropout(0.4)(rout2)
-rout2 = tf.keras.layers.Flatten()(rout2)
+rout2 = tf.keras.layers.Dropout(0.2)(rout2)
 
 x = tf.keras.layers.Concatenate()([rout1, rout2])
 
 # Regression Head
-'''
-x = tf.keras.layers.Dense(2048, kernel_regularizer = 'l2')(x)
-x = tf.keras.layers.LeakyReLU()(x)
-x = tf.keras.layers.Dense(1024, kernel_regularizer = 'l2')(x)
-x = tf.keras.layers.LeakyReLU()(x)
-x = tf.keras.layers.Dense(512, kernel_regularizer = 'l2')(x)
-x = tf.keras.layers.LeakyReLU()(x)
 x = tf.keras.layers.Dense(256, kernel_regularizer = 'l2')(x)
-x = tf.keras.layers.LeakyReLU()(x)
-'''
+x = tf.keras.layers.ReLU()(x)
+
 output = tf.keras.layers.Dense(3, name = 'output')(x)
 
 model = tf.keras.Model(inputs = inputs, outputs = output)
