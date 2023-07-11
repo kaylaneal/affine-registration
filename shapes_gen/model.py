@@ -11,15 +11,19 @@ rout2 = resnet(inputs[:, 1], training = False)
 
 x = tf.keras.layers.Concatenate()([rout1, rout2])
 
+x = tf.keras.layers.Conv2D(2048, kernel_size = 5)(x)
+x = tf.keras.layers.BatchNormalization()(x)
+x = tf.keras.layers.ReLU()(x)
+
 x = tf.keras.layers.Conv2D(1024, kernel_size = 3)(x)
 x = tf.keras.layers.BatchNormalization()(x)
 x = tf.keras.layers.ReLU()(x)
 
-x = tf.keras.layers.Conv2D(512, kernel_size = 3)(x)
+x = tf.keras.layers.Conv2D(512, kernel_size = 1)(x)
 x = tf.keras.layers.BatchNormalization()(x)
 x = tf.keras.layers.ReLU()(x)
 
-x = tf.keras.layers.Conv2D(256, kernel_size = 3)(x)
+x = tf.keras.layers.Conv2D(256, kernel_size = 1)(x)
 x = tf.keras.layers.BatchNormalization()(x)
 x = tf.keras.layers.ReLU()(x)
 

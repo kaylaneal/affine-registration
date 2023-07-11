@@ -1,26 +1,35 @@
 from PIL import Image, ImageDraw
 import random
+import csv
 
-# Generate Imageset:
-for i in range(50):
-	# create image and drawing ability
-	img = Image.new("RGB", (256, 256), "black")
-	draw = ImageDraw.Draw(img)
+# Generate Imageset & Save to CSV:
+header = ['static', 'moving', 'theta', 'x', 'y']
+with open('shapeset.csv', 'w') as csvfile:
+	writer = csv.writer(csvfile)
 
-	# random number generation 
-	pointA = (random.randint(10, 250), random.randint(10, 250))
-	pointB = (random.randint(10, 250), random.randint(10, 250))
-	pointC = (random.randint(10, 250), random.randint(10, 250))
+	writer.writerow(header)
 
-	# draw random triangle
-	draw.polygon((pointA, pointB, pointC), fill = 'white')
-	img.save(f'pairs/target{i}.png')
+	for i in range(200):
+		# create image and drawing ability
+		img = Image.new("RGB", (256, 256), "black")
+		draw = ImageDraw.Draw(img)
 
-	# random transformation
-	theta = random.randint(0, 360)
-	dx = random.randint(0, 5)
-	dy = random.randint(0, 5)
+		# random number generation 
+		pointA = (random.randint(10, 250), random.randint(10, 250))
+		pointB = (random.randint(10, 250), random.randint(10, 250))
+		pointC = (random.randint(10, 250), random.randint(10, 250))
 
-	src = img.copy()
-	src = src.rotate(angle = theta, translate = (dx, dy))
-	src.save(f'pairs/move{i}_{theta}_{dx}_{dy}.png')
+		# draw random triangle
+		draw.polygon((pointA, pointB, pointC), fill = 'white')
+		img.save(f'pairs/target{i}.png')
+
+		# random transformation
+		theta = random.randint(0, 360)
+		dx = random.randint(0, 5)
+		dy = random.randint(0, 5)
+
+		src = img.copy()
+		src = src.rotate(angle = theta, translate = (dx, dy))
+		src.save(f'pairs/move{i}_{theta}_{dx}_{dy}.png')
+
+		writer.writerow([f'pairs/target{i}.png', f'pairs/move{i}_{theta}_{dx}_{dy}.png', theta, dx, dy])

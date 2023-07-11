@@ -6,7 +6,7 @@ from dataset import ShapeDataset
 
 model = tf.keras.models.load_model('shape_reg')
 
-data = ShapeDataset('shape_dataset.csv')
+data = ShapeDataset('shapeset.csv')
 data.process()
 
 X = [p for p in data.pairs.values()]
