@@ -43,7 +43,7 @@ model.compile(optimizer = opt, loss = loss, metrics = metric)
 # Train Model
 print('** TRAINING **')
 escb = callbacks.EarlyStopping(monitor = 'val_loss', patience = 8, restore_best_weights = True)
-lcb = callbacks.CSVLogger('training_log.csv')
+lcb = callbacks.CSVLogger('logs/training_log.csv')
 
 history = model.fit([train_sx, train_mx], train_y, 
                     validation_data = ([valid_sx, valid_mx], valid_y),

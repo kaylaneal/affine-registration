@@ -7,3 +7,6 @@ init_datasets.py
 explore_dataset.py
 
 initial_network.py
+
+base_models/DHR_insp/AffineNet
+base_models/stratified_input/multi_affine
